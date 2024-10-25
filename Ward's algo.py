@@ -37,7 +37,8 @@ while len(clusters) > 1:
             if dist < min_distance:
                 min_distance = dist
                 clusters_to_merge = (i, j)
-
+                print("Distance of: ", clusters[i], clusters[j])
+                print(dist, end="\n")
     i, j = clusters_to_merge
     new_cluster = clusters[i] + clusters[j]
     clusters = [clusters[k] for k in range(len(clusters)) if k not in (i, j)]
@@ -48,20 +49,28 @@ while len(clusters) > 1:
     merge_history.append((i, j))
     heights.append(min_distance)
 def plot_dendrogram(merge_history, heights):
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(12, 6))
     current_positions = np.arange(n)
+    colors = plt.cm.viridis(np.linspace(0, 1, len(merge_history)))
+
     for idx, (merge, height) in enumerate(zip(merge_history, heights)):
         i, j = merge
-        plt.plot([current_positions[i], current_positions[i]], [0, height], 'k-')  # Vertical line for cluster i
-        plt.plot([current_positions[j], current_positions[j]], [0, height], 'k-')  # Vertical line for cluster j
-        plt.plot([current_positions[i], current_positions[j]], [height, height],
-                 'k-')
+        plt.plot([current_positions[i], current_positions[i]], [0, height], color=colors[idx])
+        plt.plot([current_positions[j], current_positions[j]], [0, height], color=colors[idx])
+        plt.plot([current_positions[i], current_positions[j]], [height, height], color=colors[idx])
+
         new_position = (current_positions[i] + current_positions[j]) / 2
         current_positions = np.delete(current_positions, [i, j])
         current_positions = np.append(current_positions, new_position)
 
-    plt.title("Dendrogram (Manual Implementation)")
+    for idx, pos in enumerate(np.arange(n)):
+        plt.text(pos, -0.5, f'D{idx+1}', ha='center', va='top', fontsize=10, color='blue', rotation=45)
+
+    plt.title("Enhanced Dendrogram (Manual Implementation)")
     plt.xlabel("Data Points")
     plt.ylabel("Distance")
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
     plt.show()
+
 plot_dendrogram(merge_history, heights)
